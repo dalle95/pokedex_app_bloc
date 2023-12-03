@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "646137454511",
+    "project_id": "pokedex-bloc-architecture",
+    "storage_bucket": "pokedex-bloc-architecture.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:646137454511:android:49e6087dd772ce9e1ed95a",
+        "android_client_info": {
+          "package_name": "it.sdv.pokedex_app_bloc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAsjqn0VtvqnR0b-K0-o8SM9imUGBXSMLg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
