@@ -21,6 +21,8 @@ class AggiornamentoAppHelper {
     // Per gestire i log
     var logger = Logger();
 
+    logger.d('controlloAggiornamenti');
+
     // Nel caso in cui la chiamata per il download della nuova versione non va a buon fine avverto l'utente
     Future<void> messaggioErrore(
       BuildContext context,
