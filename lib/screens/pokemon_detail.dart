@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sample_bloc_architecture/ui/widgets/error_view.dart';
-import '/ui/widgets/loading_view.dart';
-import '/ui/widgets/pokemon_detail_view.dart';
+import 'package:sample_bloc_architecture/ui/widgets/vario/error_view.dart';
+import '../ui/widgets/vario/loading_view.dart';
+import '../ui/widgets/pokemon_detail/pokemon_detail_view.dart';
 import '/data/models/pokemon_detail_model.dart';
 import '/blocs/pokemon_detail/pokemon_detail_blocs.dart';
 import '/blocs/pokemon_detail/pokemon_detail_events.dart';

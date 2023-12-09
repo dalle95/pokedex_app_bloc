@@ -3,7 +3,7 @@ import 'package:logger/logger.dart';
 
 import '/data/models/pokemon_list_model.dart';
 
-import '/ui/widgets/homepage_view.dart';
+import '../ui/widgets/pokemon_list/homepage_view.dart';
 
 Logger logger = Logger();
 

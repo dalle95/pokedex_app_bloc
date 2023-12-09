@@ -1,5 +1,3 @@
-import 'package:sample_bloc_architecture/screens/homepage.dart';
-
 import '/data/remote/api_base_service.dart';
 import '/data/remote/api_endpoints.dart';
 import '/data/remote/api_network_service.dart';
@@ -30,8 +28,6 @@ class PokemonListRepositoryImp extends PokemonListRepository {
       if (categoria == 'pokemon') {
         endpoint = ApiEndPoints().parametroListaPokemon;
       }
-
-      logger.d(endpoint);
 
       dynamic response = await _apiService.getListPokemons(
         endpoint,

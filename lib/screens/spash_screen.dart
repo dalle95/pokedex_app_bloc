@@ -3,9 +3,9 @@ import 'package:logger/logger.dart';
 
 import '/helpers/aggiornamento_app_helper.dart';
 
-import '/ui/widgets/donwload_nuova_versione.dart';
-import '/ui/widgets/loading_view.dart';
-import '/ui/widgets/homepage_view.dart';
+import '../ui/widgets/download_app/donwload_nuova_versione.dart';
+import '../ui/widgets/vario/loading_view.dart';
+import '../ui/widgets/pokemon_list/homepage_view.dart';
 
 Logger logger = Logger();
 

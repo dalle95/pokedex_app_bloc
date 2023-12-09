@@ -3,10 +3,10 @@ import 'package:gap/gap.dart';
 
 import '/data/models/pokemon_detail_model.dart';
 
-import '/ui/widgets/pokemon_detail_sezione_mosse.dart';
-import '/ui/widgets/pokemon_detail_sezione_statistiche.dart';
-import '/ui/widgets/pokemon_detail_sezione_avatar.dart';
-import '/ui/widgets/pokemon_detail_sezione_datianagrafici.dart';
+import 'pokemon_detail_sezione_mosse.dart';
+import 'pokemon_detail_sezione_statistiche.dart';
+import 'pokemon_detail_sezione_avatar.dart';
+import 'pokemon_detail_sezione_datianagrafici.dart';
 
 class PokemonDetailView extends StatelessWidget {
   final PokemonDetailModel? pokemon;

@@ -4,7 +4,7 @@ import 'package:gap/gap.dart';
 import '/labels.dart';
 
 import '/data/models/pokemon_detail_model.dart';
-import '/ui/widgets/pokemon_type_sezione.dart';
+import 'pokemon_type_sezione.dart';
 
 class PokemonDetailSezioneDatiAnagrafici extends StatelessWidget {
   const PokemonDetailSezioneDatiAnagrafici({

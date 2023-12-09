@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -121,19 +122,30 @@ class AggiornamentoAppHelper {
     final infoApp = await PackageInfo.fromPlatform();
     final infoVersioneApp = '${infoApp.version}+${infoApp.buildNumber}';
 
+    String infoVersioneFirebase = '';
+
     // Recupero le remote config di Firebase
     final remoteConfig = FirebaseRemoteConfig.instance;
-    await remoteConfig.setConfigSettings(
-      RemoteConfigSettings(
-        fetchTimeout: const Duration(minutes: 1),
-        minimumFetchInterval: const Duration(minutes: 1),
-      ),
-    );
 
-    await remoteConfig.fetchAndActivate();
+    try {
+      await remoteConfig.setConfigSettings(
+        RemoteConfigSettings(
+          fetchTimeout: const Duration(minutes: 1),
+          minimumFetchInterval: const Duration(minutes: 1),
+        ),
+      );
 
-    // Recupero l'ultima versione dell'app settata su Firebase
-    final infoVersioneFirebase = remoteConfig.getString('lastAppVersion');
+      await remoteConfig.fetchAndActivate();
+
+      // Recupero l'ultima versione dell'app settata su Firebase
+      infoVersioneFirebase = remoteConfig.getString('lastAppVersion');
+    } on FirebaseException catch (exception) {
+      // Fetch throttled.
+      logger.d(exception);
+      rethrow;
+    } catch (error) {
+      rethrow;
+    }
 
     logger.d(
       'Versione App: $infoVersioneApp\n Versione Firebase: $infoVersioneFirebase',

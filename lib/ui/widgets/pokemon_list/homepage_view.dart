@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 
 import '/blocs/pokemon_list/pokemon_list_blocs.dart';
 import '/blocs/pokemon_list/pokemon_list_events.dart';
@@ -10,10 +11,10 @@ import '/data/models/pokemon_list_model.dart';
 import '/screens/homepage.dart';
 import '/screens/search_page.dart';
 
-import '/ui/widgets/error_view.dart';
-import '/ui/widgets/homepage_appbar_title.dart';
-import '/ui/widgets/loading_view.dart';
-import '/ui/widgets/pokemon_list_view.dart';
+import '../vario/error_view.dart';
+import 'homepage_appbar_title.dart';
+import '../vario/loading_view.dart';
+import 'pokemon_list_view.dart';
 
 class HomepageView extends StatefulWidget {
   final String categoria;
@@ -34,49 +35,57 @@ class _HomepageViewState extends State<HomepageView> {
 
   List<PokemonListModel> pokemonList = [];
 
-  Future<String> mostraModal() async {
-    String stringa = await showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          builder: (context) {
-            return Padding(
-              padding: EdgeInsets.only(
-                left: 30,
-                right: 30,
-                top: 20,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-              ),
-              child: Wrap(
-                children: [
-                  Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Nome',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ),
-                  TextFormField(
-                    autofocus: true,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall!
-                        .copyWith(fontSize: 15),
-                    // onChanged: (stringa) {
-                    //   aggiornaLista(stringa);
-                    // },
-                    onFieldSubmitted: (stringa) {
-                      Navigator.pop(context, stringa);
-                    },
-                  ),
-                ],
-              ),
-            );
-          },
-        ) ??
-        '';
+  String? nome;
 
-    return stringa;
+  Future<void> mostraModal(BuildContext blocContext) async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 30,
+            right: 30,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          child: Wrap(
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: Text(
+                  'Nome',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+              TextFormField(
+                autofocus: true,
+                textAlign: TextAlign.center,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall!
+                    .copyWith(fontSize: 15),
+                onChanged: (stringa) {
+                  BlocProvider.of<PokemonListBloc>(blocContext).add(
+                    PokemonUpdateEvent(
+                      stringa,
+                      pokemonMainList,
+                    ),
+                  );
+                },
+                onFieldSubmitted: (stringa) {
+                  setState(() {
+                    nome = stringa;
+                  });
+
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -114,21 +123,39 @@ class _HomepageViewState extends State<HomepageView> {
               ),
             ],
           ),
-          floatingActionButton: FloatingActionButton(
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            onPressed: () async {
-              String nome = await mostraModal();
-              // ignore: use_build_context_synchronously
-              BlocProvider.of<PokemonListBloc>(context).add(
-                PokemonUpdateEvent(
-                  nome,
-                  pokemonMainList,
+          floatingActionButton: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              nome != null
+                  ? FloatingActionButton(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      onPressed: () {
+                        setState(() {
+                          nome = null;
+                        });
+                        BlocProvider.of<PokemonListBloc>(context).add(
+                          PokemonInitEvent(
+                            widget.categoria,
+                            widget.id,
+                          ),
+                        );
+                      },
+                      child: const Icon(
+                        Icons.search_off,
+                      ),
+                    )
+                  : const SizedBox(),
+              const Gap(10),
+              FloatingActionButton(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                onPressed: () async {
+                  await mostraModal(context);
+                },
+                child: const Icon(
+                  Icons.search_rounded,
                 ),
-              );
-            },
-            child: const Icon(
-              Icons.search_rounded,
-            ),
+              ),
+            ],
           ),
           body: BlocBuilder<PokemonListBloc, PokemonListState>(
             builder: (context, state) {

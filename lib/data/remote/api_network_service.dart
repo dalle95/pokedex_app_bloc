@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '/data/remote/api_endpoints.dart';
 
 import '/data/models/search_parameters.dart';
@@ -267,5 +269,43 @@ class NetworkApiService extends BaseApiService {
       logger.d(error);
       throw Exception(error.toString());
     }
+  }
+
+  @override
+  // Funzione per controllare se è presente una nuova versione dell'app
+  Future<bool> checkNuovaVersione() async {
+    // Recupero la versione dell'applicazione
+    final infoApp = await PackageInfo.fromPlatform();
+    final infoVersioneApp = '${infoApp.version}+${infoApp.buildNumber}';
+
+    // Recupero le remote config di Firebase
+    final remoteConfig = FirebaseRemoteConfig.instance;
+    await remoteConfig.setConfigSettings(
+      RemoteConfigSettings(
+        fetchTimeout: const Duration(minutes: 1),
+        minimumFetchInterval: const Duration(minutes: 1),
+      ),
+    );
+
+    await remoteConfig.fetchAndActivate();
+
+    // Recupero l'ultima versione dell'app settata su Firebase
+    final infoVersioneFirebase = remoteConfig.getString('lastAppVersion');
+
+    logger.d(
+      'Versione App: $infoVersioneApp\n Versione Firebase: $infoVersioneFirebase',
+    );
+
+    // Confronto Versioni in formato stringa
+    if (infoVersioneFirebase == infoVersioneApp) {
+      return true;
+    }
+    return false;
+  }
+
+  @override
+  // Funzione per scaricare la nuova versione dell'app
+  Future<bool> scaricaNuovaVersione() async {
+    return true;
   }
 }

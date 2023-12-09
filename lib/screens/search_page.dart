@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sample_bloc_architecture/ui/widgets/error_view.dart';
+import 'package:sample_bloc_architecture/ui/widgets/vario/error_view.dart';
 
 import '/data/models/search_parameters.dart';
 
@@ -8,8 +8,8 @@ import '/blocs/pokemon_search_parameters/pokemon_search_parameters_blocs.dart';
 import '/blocs/pokemon_search_parameters/pokemon_search_parameters_events.dart';
 import '/blocs/pokemon_search_parameters/pokemon_search_parameters_states.dart';
 
-import '/ui/widgets/loading_view.dart';
-import '/ui/widgets/search_page_view.dart';
+import '../ui/widgets/vario/loading_view.dart';
+import '../ui/widgets/search_page/search_page_view.dart';
 
 class SearchPage extends StatefulWidget {
   static const routeName = 'search-page';

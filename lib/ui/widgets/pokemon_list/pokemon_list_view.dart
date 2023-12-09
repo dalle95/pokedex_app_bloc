@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../ui/widgets/pokemon_list_item.dart';
-import '../../data/models/pokemon_list_model.dart';
+import 'pokemon_list_item.dart';
+import '../../../data/models/pokemon_list_model.dart';
 
 class PolemonListView extends StatelessWidget {
   const PolemonListView({

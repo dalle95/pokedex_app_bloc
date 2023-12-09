@@ -5,7 +5,7 @@ import '/labels.dart';
 
 import '/screens/homepage.dart';
 
-import '/ui/widgets/dropdown_button.dart';
+import 'dropdown_button.dart';
 
 class SearchPageView extends StatelessWidget {
   const SearchPageView({

@@ -18,4 +18,10 @@ abstract class BaseApiService {
     String urlPokedex,
     String urlGenerazione,
   );
+
+  // Funzione per controllare se è presente una nuova versione dell'app
+  Future<bool> checkNuovaVersione();
+
+  // Funzione per scaricare la nuova versione dell'app
+  Future<bool> scaricaNuovaVersione();
 }
