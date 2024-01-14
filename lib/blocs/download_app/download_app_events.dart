@@ -1,10 +1,9 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-abstract class DownloadAppEventBloc extends Equatable {
-  const DownloadAppEventBloc();
-}
+part 'download_app_events.freezed.dart';
 
-class DownloadAppEvent extends DownloadAppEventBloc {
-  @override
-  List<Object> get props => [];
+// Eventi associati al download
+@freezed
+class DownloadEvent with _$DownloadEvent {
+  const factory DownloadEvent.startDownload() = StartDownloadEvent;
 }

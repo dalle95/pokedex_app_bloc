@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:http/http.dart';
+
 import '/data/models/pokemon_detail_model.dart';
 import '/data/models/pokemon_list_model.dart';
 import '/data/models/search_parameters.dart';
@@ -22,6 +26,9 @@ abstract class BaseApiService {
   // Funzione per controllare se è presente una nuova versione dell'app
   Future<bool> checkNuovaVersione();
 
+  // Funzione per estrarre la grandezza del file
+  Future<int> getFileSize();
+
   // Funzione per scaricare la nuova versione dell'app
-  Future<bool> scaricaNuovaVersione();
+  Future<ByteStream> scaricaNuovaVersione();
 }

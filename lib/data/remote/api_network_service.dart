@@ -1,9 +1,15 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:path_provider/path_provider.dart';
 import '/data/remote/api_endpoints.dart';
 
 import '/data/models/search_parameters.dart';
@@ -271,26 +277,77 @@ class NetworkApiService extends BaseApiService {
     }
   }
 
+  // Funzione per estrarre la Versione dell'app in Firebase
+  Future<String> getVersioneAppFirebase() async {
+    String infoVersioneFirebase = '';
+
+    // Recupero le remote config di Firebase
+    final remoteConfig = FirebaseRemoteConfig.instance;
+
+    try {
+      await remoteConfig.setConfigSettings(
+        RemoteConfigSettings(
+          fetchTimeout: const Duration(minutes: 1),
+          minimumFetchInterval: const Duration(minutes: 1),
+        ),
+      );
+
+      await remoteConfig.fetchAndActivate();
+
+      // Recupero l'ultima versione dell'app settata su Firebase
+      infoVersioneFirebase = remoteConfig.getString('lastAppVersion');
+    } on FirebaseException catch (exception) {
+      // Fetch throttled.
+      logger.d(exception);
+      rethrow;
+    } catch (error) {
+      rethrow;
+    }
+
+    return infoVersioneFirebase;
+  }
+
+  // Funzione per estrarre la Versione dell'app in Firebase
+  Future<String> getDownloadUrlFirebase() async {
+    String downloadUrl = '';
+
+    // Recupero le remote config di Firebase
+    final remoteConfig = FirebaseRemoteConfig.instance;
+
+    try {
+      await remoteConfig.setConfigSettings(
+        RemoteConfigSettings(
+          fetchTimeout: const Duration(minutes: 1),
+          minimumFetchInterval: const Duration(minutes: 1),
+        ),
+      );
+
+      await remoteConfig.fetchAndActivate();
+
+      // Recupero l'ultima versione dell'app settata su Firebase
+      downloadUrl = remoteConfig.getString('downloadUrl');
+    } on FirebaseException catch (exception) {
+      // Fetch throttled.
+      logger.d(exception);
+      rethrow;
+    } catch (error) {
+      rethrow;
+    }
+
+    return downloadUrl;
+  }
+
   @override
   // Funzione per controllare se è presente una nuova versione dell'app
   Future<bool> checkNuovaVersione() async {
+    logger.d('Funzione: checkNuovaVersione');
+
     // Recupero la versione dell'applicazione
     final infoApp = await PackageInfo.fromPlatform();
     final infoVersioneApp = '${infoApp.version}+${infoApp.buildNumber}';
 
-    // Recupero le remote config di Firebase
-    final remoteConfig = FirebaseRemoteConfig.instance;
-    await remoteConfig.setConfigSettings(
-      RemoteConfigSettings(
-        fetchTimeout: const Duration(minutes: 1),
-        minimumFetchInterval: const Duration(minutes: 1),
-      ),
-    );
-
-    await remoteConfig.fetchAndActivate();
-
     // Recupero l'ultima versione dell'app settata su Firebase
-    final infoVersioneFirebase = remoteConfig.getString('lastAppVersion');
+    final infoVersioneFirebase = await getVersioneAppFirebase();
 
     logger.d(
       'Versione App: $infoVersioneApp\n Versione Firebase: $infoVersioneFirebase',
@@ -298,14 +355,124 @@ class NetworkApiService extends BaseApiService {
 
     // Confronto Versioni in formato stringa
     if (infoVersioneFirebase == infoVersioneApp) {
-      return true;
+      return false;
     }
-    return false;
+    return true;
+  }
+
+  @override
+  // Funzione per estrarre la grandezza del file
+  Future<int> getFileSize() async {
+    // Estraggo la versione presente su Firebase
+    final infoVersioneFirebase = await getVersioneAppFirebase();
+
+    // Recupero la radice dell'URL per download nuova versione app
+    final downloadUrlRadice = await getDownloadUrlFirebase();
+
+    // Compongo l'URL da cui scaricare la nuova versione dell'app
+    final downloadUrl =
+        '$downloadUrlRadice/${(infoVersioneFirebase).replaceAll('+', '/')}/app-release.apk';
+
+    try {
+      final response = await http.head(Uri.parse(downloadUrl));
+      if (response.statusCode == HttpStatus.ok) {
+        final contentLength = response.headers['content-length'];
+        if (contentLength != null) {
+          return int.parse(contentLength);
+        }
+      }
+    } catch (error) {
+      rethrow;
+    }
+
+    return -1; // Ritorno un valore sentinella in caso di errore o mancanza di informazioni
   }
 
   @override
   // Funzione per scaricare la nuova versione dell'app
-  Future<bool> scaricaNuovaVersione() async {
-    return true;
+  Future<http.ByteStream> scaricaNuovaVersione() async {
+    // Estraggo la versione presente su Firebase
+    final infoVersioneFirebase = await getVersioneAppFirebase();
+
+    // Recupero la radice dell'URL per download nuova versione app
+    final downloadUrlRadice = await getDownloadUrlFirebase();
+
+    // Compongo l'URL da cui scaricare la nuova versione dell'app
+    final downloadUrl =
+        '$downloadUrlRadice/${(infoVersioneFirebase).replaceAll('+', '/')}/app-release.apk';
+
+    // Definisco la directory per i download
+    String directoryDownload = (await getApplicationDocumentsDirectory()).path;
+    // Definisco la directory per salvare il file
+    File directoryFile = File('$directoryDownload/Pokedex.apk');
+
+    // Definizione URL per richiesta get
+    final url = Uri.parse(downloadUrl);
+
+    // Chiamata get per download apk
+    final request = http.Request(
+      'GET',
+      url,
+    );
+
+    // Definifione Client
+    var httpClient = http.Client();
+
+    // Recupero la risposta alla chiamata
+    var response = await httpClient.send(request);
+
+    final stream = response.stream;
+
+    return stream;
+
+    // // Definisco le variabili per controllare il download
+    // List<List<int>> chunks = [];
+    // int downloaded = 0;
+    // int downloadPercentuale = 0;
+
+    // // Dichiaro lo streamcontroller per gestire il download
+    // final StreamController<int> _progressController = StreamController<int>();
+
+    // // Inizio la stream per controllare il progresso
+    // response.asStream().listen(
+    //   (http.StreamedResponse r) {
+    //     // Se la chiamata per il download non va buon fine
+    //     if (r.statusCode != 200) {
+    //       //messaggioErrore(context, aggiornamentoApp);
+    //     }
+    //     r.stream.listen(
+    //       (List<int> chunk) {
+    //         // Calcolo la percentuale di download
+    //         downloadPercentuale = (downloaded / r.contentLength! * 100).toInt();
+
+    //         // Aggiorno la percentuale
+    //         _progressController.add(downloadPercentuale);
+
+    //         chunks.add(chunk);
+    //         downloaded += chunk.length;
+    //       },
+    //       onDone: () async {
+    //         // Calcolo la percentuale di download
+    //         downloadPercentuale = (downloaded / r.contentLength! * 100).toInt();
+
+    //         // Aggiorno la percentuale
+    //         _progressController.add(downloadPercentuale);
+
+    //         // Salvataggio del file
+    //         final Uint8List bytes = Uint8List(r.contentLength ?? 0);
+    //         int offset = 0;
+    //         for (List<int> chunk in chunks) {
+    //           bytes.setRange(offset, offset + chunk.length, chunk);
+    //           offset += chunk.length;
+    //         }
+    //         await directoryFile.writeAsBytes(bytes);
+
+    //         _progressController.close();
+    //       },
+    //     );
+    //   },
+    // );
+
+    // return _progressController;
   }
 }

@@ -5,11 +5,11 @@ import '/labels.dart';
 class DownloadNuovaVersioneApp extends StatelessWidget {
   const DownloadNuovaVersioneApp({
     Key? key,
-    required double percentuale,
+    required int percentuale,
   })  : _percentuale = percentuale,
         super(key: key);
 
-  final double _percentuale;
+  final int _percentuale;
 
   @override
   Widget build(BuildContext context) {
@@ -42,14 +42,14 @@ class DownloadNuovaVersioneApp extends StatelessWidget {
                       Center(
                         child: LinearProgressIndicator(
                           backgroundColor: Colors.grey,
-                          value: _percentuale,
+                          value: _percentuale / 100,
                           color: Theme.of(context).colorScheme.primary,
                           minHeight: 50,
                         ),
                       ),
                       Center(
                         child: Text(
-                          '${(_percentuale * 100).toStringAsFixed(2)}%',
+                          '$_percentuale%',
                           style: const TextStyle(
                             color: Colors.white,
                           ),

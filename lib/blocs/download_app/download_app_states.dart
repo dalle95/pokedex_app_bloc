@@ -1,29 +1,18 @@
-import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-@immutable
-abstract class DownloadAppState extends Equatable {}
+part 'download_app_states.freezed.dart';
 
-// Stato dati in caricamento
-class DownloadAppLoadingState extends DownloadAppState {
-  @override
-  List<Object?> get props => [];
-}
-
-// Stato: dati caricati
-class DownloadAppLoadedState extends DownloadAppState {
-  DownloadAppLoadedState(this.nuovaVersione);
-  final bool nuovaVersione;
-
-  @override
-  List<Object?> get props => [nuovaVersione];
-}
-
-// Stato: errore caricamento dati
-class DownloadAppErrorState extends DownloadAppState {
-  DownloadAppErrorState(this.error);
-  final String error;
-
-  @override
-  List<Object?> get props => [error];
+// Stati associati al download
+@freezed
+class DownloadState with _$DownloadState {
+  // Stati per gestione download nuova versione app
+  // Stato: download nuova versione app in corso
+  const factory DownloadState.initDownload() = DownloadInitState;
+  // Stato: download nuova versione app in corso
+  const factory DownloadState.inProgress(int percentuale) =
+      DownloadInProgressState;
+  // Stato: download nuova versione app completato
+  const factory DownloadState.complete() = DownloadCompleteState;
+  // Stato: download nuova versione app in errore
+  const factory DownloadState.error(String error) = DownloadErrorState;
 }
